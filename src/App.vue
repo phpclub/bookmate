@@ -1,7 +1,6 @@
 <template>
   <div id="app">
-    <img alt="Bookmate" src="./assets/logo.png">
-    <Header msg="Bookmate"/>
+    <Header title="Bookmate - CRUD приложение по типу книжный магазин"/>
   </div>
 </template>
 
