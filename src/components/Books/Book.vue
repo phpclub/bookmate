@@ -67,13 +67,13 @@
       </b-form-group>
 
       <b-form-group
-          id="bookform-input-group-descr"
+          id="bookform-input-group-desc"
           label="Описание:"
-          label-for="bookform-input-descr"
+          label-for="bookform-input-desc"
       >
         <b-form-textarea
-            id="bookform-input-descr"
-            v-model="bookform.descr"
+            id="bookform-input-desc"
+            v-model="bookform.desc"
             max-rows="6"
             placeholder="Краткое описание книги"
             required
@@ -139,7 +139,7 @@ export default {
         isbn: '',
         authors: [],
         photo: '',
-        descr: '',
+        desc: '',
         tags: [],
         price: 0,
         category: null
