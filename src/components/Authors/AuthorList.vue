@@ -1,6 +1,5 @@
 <template>
   <div>
-    <b-tab title="Авторы">
       <b-button v-b-modal.modal-author>Добавить Автора</b-button>
       <b-modal
           id="modal-author"
@@ -10,8 +9,13 @@
       >
         <Author v-on:update:author="addAuthor($event)"/>
       </b-modal>
-      <b-table :fields="authorfields" :items="authors" striped></b-table>
-    </b-tab>
+      <b-table :fields="authorfields" :items="authors" striped>
+
+        <template v-slot:cell(name)="data">
+          <b-link :to="`/author/`+data.item.id">{{ data.value }}</b-link>
+        </template>
+
+      </b-table>
   </div>
 </template>
 
