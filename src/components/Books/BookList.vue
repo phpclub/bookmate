@@ -45,7 +45,7 @@
         <b-link :to="`/book/`+data.item.id">{{ data.value }}</b-link>
       </template>
       <template v-slot:cell(photo)="data">
-        <b-img :src="data.value" alt="Fluid image" fluid></b-img>
+        <b-img :src="data.value" :alt="`Обложка книги: `+data.item.title"  fluid></b-img>
       </template>
       <template v-slot:cell(authors)="data">
           <span v-for="item in data.value" v-bind:key="item.id">
@@ -170,8 +170,7 @@ export default {
       }
     } else {
       this.books = init.books
-      const parsed = JSON.stringify(this.books);
-      localStorage.setItem('books', parsed);
+      this.syncStorage()
     }
     if (localStorage.getItem('authors')) {
       const authors = JSON.parse(localStorage.getItem('authors'));

@@ -146,16 +146,6 @@ export default {
       },
       optionsauthors: [], //[{text: 'Укажите автора', value: null}],
       optionscategory: [{text: 'Укажите категорию', value: null}, 'Классика','Детективы','Фантастика'],
-      bookfields: [
-        {key: 'isbn', label: "ISBN"},
-        {key: 'title', label: "Название", sortable: true},
-        {key: 'authors', label: "Автор(ы)"},
-        {key: 'photo', label: "Обложка"},
-        {key: 'desc', label: "Описание"},
-        {key: 'tags', label: "Тэги"},
-        {key: 'price', label: "Цена", sortable: true},
-        {key: 'category', label: "Категория"}
-      ],
     }
   },
   computed: {
