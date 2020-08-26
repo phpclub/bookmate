@@ -59,8 +59,7 @@ export default {
       }
     } else {
       this.authors = init.authors
-      const parsed = JSON.stringify(this.authors);
-      localStorage.setItem('authors', parsed);
+      this.syncStorage()
     }
   },
 }

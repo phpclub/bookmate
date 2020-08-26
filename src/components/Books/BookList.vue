@@ -43,7 +43,7 @@
           <b-button @click="showConfirmBox(data.value)">X</b-button>
         </template>
         <template v-slot:cell(photo)="data">
-          <b-img :src="data.value" alt="Fluid image" fluid></b-img>
+          <b-img :alt="`Обложка книги: `+data.item.title" :src="data.value" fluid></b-img>
         </template>
         <template v-slot:cell(authors)="data">
           <span v-for="item in data.value" v-bind:key="item.id">
@@ -164,8 +164,7 @@ export default {
       }
     } else {
       this.books = init.books
-      const parsed = JSON.stringify(this.books);
-      localStorage.setItem('books', parsed);
+      this.syncStorage()
     }
     if (localStorage.getItem('authors')) {
       const authors = JSON.parse(localStorage.getItem('authors'));
