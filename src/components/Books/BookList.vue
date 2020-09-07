@@ -1,5 +1,6 @@
 <template>
   <div>
+    <b-button v-b-modal.modal-book>Добавить книгу</b-button>
     <b-form-group
         class="mb-0"
         label="Фильтр"
@@ -16,15 +17,13 @@
       />
     </b-form-group>
 
-    <b-button v-b-modal.modal-book>Добавить книгу</b-button>
-
     <b-modal
         id="modal-book"
         ref="modal-book"
         hide-footer
         title="Новая Книга"
     >
-      <Book v-on:update:book="addBook($event)"/>
+      <BookForm v-on:update:book="addBook($event)"/>
     </b-modal>
 
     <b-table
@@ -45,13 +44,13 @@
         <b-link :to="`/book/`+data.item.id">{{ data.value }}</b-link>
       </template>
       <template v-slot:cell(photo)="data">
-        <b-img :src="data.value" :alt="`Обложка книги: `+data.item.title"  fluid></b-img>
+        <b-img :alt="`Обложка книги: `+data.item.title" :src="data.value" fluid></b-img>
       </template>
       <template v-slot:cell(authors)="data">
           <span v-for="item in data.value" v-bind:key="item.id">
            <span v-for="author in authorslist" v-bind:key="author.id">
             <span v-if="author.value === item">
-              <b-link :to="`/author/`+author.value">{{ author.text }}</b-link>
+              <b-link :to="`/author/`+author.value">{{ author.text }}</b-link><br/>
             </span>
            </span>
           </span>
@@ -78,8 +77,8 @@
 </template>
 
 <script>
-import Book from "@/components/Books/Book";
-import init from "../../assets/init.json";
+import BookForm from "@/components/Books/BookForm";
+import {mapGetters} from "vuex";
 
 export default {
   name: 'BookList',
@@ -87,7 +86,7 @@ export default {
     author_id: String
   },
   components: {
-    Book
+    BookForm
   },
   data() {
     return {
@@ -112,8 +111,40 @@ export default {
       filterOn: ['title', 'desc'],
     }
   },
-  computed: {},
+  computed: {
+    ...mapGetters(
+        [
+          'BOOKS', 'AUTHORS'
+        ]),
+  },
+  watch: {
+    $route(to, from) {
+      if (from.params.author_id != to.params.author_id) {
+        //Обработаем смену
+        this.reinit()
+      }
+    }
+  },
+  mounted() {
+    this.reinit()
+    for (var prop in this.AUTHORS) {
+      this.authorslist.push({text: this.AUTHORS[prop].name, value: this.AUTHORS[prop].id})
+    }
+  },
   methods: {
+    reinit() {
+      this.books = [];
+      if (this.author_id > 0) {
+        for (let prop in this.BOOKS) {
+          // Если вызываем со странице автора - отфильтруем где он автор
+          if (this.BOOKS[prop].authors.includes(parseInt(this.author_id))) {
+            this.books.push(this.BOOKS[prop])
+          }
+        }
+      } else {
+        this.books = this.BOOKS
+      }
+    },
     getBookNameById(id) {
       for (let prop in this.books) {
         if (this.books[prop].id === id) {
@@ -128,7 +159,17 @@ export default {
       //по хорошему нужно использовать генератор ID
       book.id = this.books.length + 1
       this.books.push(book)
-      this.syncStorage()
+      this.$store
+          .dispatch('updateBooks', {
+            books: this.books
+          })
+          .then(() => {
+            console.log('Success')
+          })
+          .catch(err => {
+            this.error = 'Не удалось добавить книгу'
+            console.log(err)
+          })
     },
     delBook(id) {
       for (let prop in this.books) {
@@ -136,7 +177,17 @@ export default {
           this.book = this.books.splice(prop, 1)
         }
       }
-      this.syncStorage()
+      this.$store
+          .dispatch('updateBooks', {
+            books: this.books
+          })
+          .then(() => {
+            console.log('Success')
+          })
+          .catch(err => {
+            this.error = 'Не удалось удалить книгу'
+            console.log(err)
+          })
     },
     showConfirmBox(id) {
       this.$bvModal.msgBoxConfirm('Удалить книгу "' + this.getBookNameById(id) + '" ?', {
@@ -150,49 +201,13 @@ export default {
             }
           })
     },
-    syncStorage() {
-      const parsed = JSON.stringify(this.books);
-      localStorage.setItem('books', parsed);
-    },
+
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length
       this.currentPage = 1
     }
-  },
-  mounted() {
-    if (localStorage.getItem('books')) {
-
-      try {
-        this.books = JSON.parse(localStorage.getItem('books'));
-      } catch (e) {
-        localStorage.removeItem('books');
-      }
-    } else {
-      this.books = init.books
-      this.syncStorage()
-    }
-    if (localStorage.getItem('authors')) {
-      const authors = JSON.parse(localStorage.getItem('authors'));
-      for (var prop in authors) {
-        this.authorslist.push({text: authors[prop].name, value: authors[prop].id})
-      }
-    }
-
-
-    // TODO добавить фильтр по author_id когда список загружен на странице автора
-    // Пока просто удалим чужие книжки - все равно потом на Vuex переводить все
-    if (this.author_id > 0) {
-      for (let prop in this.books) {
-        //Грязный хак надо проверять на вхождение this.author_id
-         if (this.books[prop].authors[0] != this.author_id) {
-           this.book = this.books.splice(prop, 1)
-         }
-        //console.log(this.books[prop].authors[0])
-      }
-    }
-    this.totalRows = this.books.length
-  },
+  }
 }
 </script>
 

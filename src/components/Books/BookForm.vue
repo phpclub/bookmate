@@ -113,9 +113,9 @@
         <b-form-tags
             id="bookform-input-tags"
             v-model="bookform.tags"
-            tag-pills
-            placeholder="Укажите тэги"
             add-button-text="+"
+            placeholder="Укажите тэги"
+            tag-pills
 
         />
       </b-form-group>
@@ -128,6 +128,8 @@
 </template>
 
 <script>
+
+import {mapGetters} from "vuex";
 
 export default {
   name: 'Book',
@@ -145,7 +147,7 @@ export default {
         category: null
       },
       optionsauthors: [], //[{text: 'Укажите автора', value: null}],
-      optionscategory: [{text: 'Укажите категорию', value: null}, 'Классика','Детективы','Фантастика'],
+      optionscategory: [{text: 'Укажите категорию', value: null}, 'Классика', 'Детективы', 'Фантастика'],
     }
   },
   computed: {
@@ -154,14 +156,15 @@ export default {
     },
     isbnState() {
       return this.bookform.isbn.length > 2
-    }
+    },
+    ...mapGetters(
+        [
+          'AUTHORS'
+        ]),
   },
   mounted() {
-    if (localStorage.getItem('authors')) {
-      const authors = JSON.parse(localStorage.getItem('authors'));
-      for (var prop in authors) {
-        this.optionsauthors.push({text: authors[prop].name, value: authors[prop].id})
-      }
+    for (var prop in this.AUTHORS) {
+      this.optionsauthors.push({text: this.AUTHORS[prop].name, value: this.AUTHORS[prop].id})
     }
   },
   methods: {

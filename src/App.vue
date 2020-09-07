@@ -7,6 +7,8 @@
 
 <script>
 import NavBar from "@/components/NavBar";
+import {mapMutations} from "vuex";
+
 
 export default {
   name: 'App',
@@ -16,7 +18,14 @@ export default {
   data() {
     return {}
   },
-  methods: {}
+  created() {
+    this.init()
+  },
+  methods: {
+    ...mapMutations({
+      init: 'init' // map `this.init()` to `this.$store.commit('init')`
+    })
+  }
 }
 </script>
 

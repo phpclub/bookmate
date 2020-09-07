@@ -27,9 +27,9 @@ const routes = [
     {
         path: '/author/:author_id',
         name: 'Author',
+        props: true,
         alias: "/a",
         component: () => import(/* webpackChunkName: "author" */ '../views/Author.vue'),
-        // props: true,
         children: [
             {
                 path: "",
@@ -61,5 +61,10 @@ const router = new VueRouter({
     base: process.env.BASE_URL,
     routes
 })
+
+router.beforeEach((to, from, next) => {
+    window.scrollTo(0, 0);
+    next();
+});
 
 export default router

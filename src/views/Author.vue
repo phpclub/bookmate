@@ -1,23 +1,21 @@
 <template>
   <div class="author">
     <b-container fluid>
-      TODO информация по конкретном авторе {{ $route.params.author_id }} со списком книг
-
       <b-card
-          title="Card Title"
-          img-src="https://picsum.photos/600/300/?image=25"
-          img-alt="Image"
-          img-top
-          tag="article"
-          style="max-width: 20rem;"
+          :title="Author.name"
           class="mb-2"
-          img-left
+          style="max-width: 20rem;"
+          tag="article"
       >
         <b-card-text>
-          Some quick example text to build on the card title and make up the bulk of the card's content.
+          Дата рождения: {{ Author.birthdate }}
         </b-card-text>
 
-        <b-button href="#" variant="primary">Go somewhere</b-button>
+        <b-card-text>
+          Страна: {{ Author.country }}
+        </b-card-text>
+
+
       </b-card>
 
       <router-view></router-view>
@@ -27,9 +25,40 @@
 
 <script>
 
+import {mapGetters} from "vuex";
+
 export default {
   name: 'Author',
-  components: {
+  components: {},
+  data() {
+    return {
+      id: 0
+    }
+  },
+  computed: {
+    ...mapGetters(
+        [
+          'AUTHORS'
+        ]),
+    Author() {
+      for (let prop in this.AUTHORS) {
+        if (this.AUTHORS[prop].id == this.id) {
+          return this.AUTHORS[prop]
+        }
+      }
+      return ''
+    }
+  },
+  watch: {
+    $route(to, from) {
+      if (from.params.author_id != to.params.author_id) {
+        //Обработаем смену
+        this.id = to.params.author_id
+      }
+    }
+  },
+  mounted() {
+    this.id = this.$route.params.author_id
   }
 }
 </script>
