@@ -1,28 +1,33 @@
 <template>
   <div>
-    <b-tab title="Авторы">
-      <b-button v-b-modal.modal-author>Добавить Автора</b-button>
-      <b-modal
-          id="modal-author"
-          ref="modal-author"
-          hide-footer
-          title="Новый Автор"
-      >
-        <Author v-on:update:author="addAuthor($event)"/>
-      </b-modal>
-      <b-table :fields="authorfields" :items="authors" striped></b-table>
-    </b-tab>
+    <b-button v-b-modal.modal-author>Добавить Автора</b-button>
+    <b-modal
+        id="modal-author"
+        ref="modal-author"
+        hide-footer
+        title="Новый Автор"
+    >
+      <AuthorForm v-on:update:author="addAuthor($event)"/>
+    </b-modal>
+    <b-table :fields="authorfields" :items="authors" striped>
+
+      <template v-slot:cell(name)="data">
+        <b-link :to="`/author/`+data.item.id">{{ data.value }}</b-link>
+      </template>
+
+    </b-table>
   </div>
 </template>
 
 <script>
-import Author from "@/components/Authors/Author";
+import AuthorForm from "@/components/Authors/AuthorForm";
 import init from "../../assets/init.json";
+import {mapGetters} from "vuex";
 
 export default {
   name: 'AuthorList',
   components: {
-    Author
+    AuthorForm
   },
   data() {
     return {
@@ -35,6 +40,12 @@ export default {
       authors: init.authors
     }
   },
+  computed: {
+    ...mapGetters(
+        [
+          'BOOKS', 'AUTHORS'
+        ]),
+  },
   methods: {
     addAuthor(author) {
       //TODO GenId
@@ -42,25 +53,23 @@ export default {
       //по хорошему нужно использовать генератор ID
       author.id = this.authors.length + 1
       this.authors.push(author)
-      this.syncStorage()
+      this.$store
+          .dispatch('updateAuthors', {
+            authors: this.authors
+          })
+          .then(() => {
+            console.log('Success')
+          })
+          .catch(err => {
+            this.error = 'Не удалось добавить автора'
+            console.log(err)
+          })
     },
-    syncStorage() {
-      const parsed = JSON.stringify(this.authors);
-      localStorage.setItem('authors', parsed);
-    }
+
 
   },
   mounted() {
-    if (localStorage.getItem('authors')) {
-      try {
-        this.authors = JSON.parse(localStorage.getItem('authors'));
-      } catch (e) {
-        localStorage.removeItem('authors');
-      }
-    } else {
-      this.authors = init.authors
-      this.syncStorage()
-    }
+    this.authors = this.AUTHORS
   },
 }
 </script>
